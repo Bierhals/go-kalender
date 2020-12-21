@@ -55,4 +55,10 @@ func main() {
 	fmt.Println("Erster Weihnachtsfeiertag", feiertag.ErsterWeihnachtsfeiertag(2023))
 	fmt.Println("Zweiter Weihnachtsfeiertag", feiertag.ZweiterWeihnachtsfeiertag(2023))
 	fmt.Println("Silvester", feiertag.Silvester(2023))
+
+	if feiertage, err := feiertag.NewFeiertage(2023, "DE", ""); err == nil {
+		for _, f := range *feiertage {
+			fmt.Println(f)
+		}
+	}
 }
