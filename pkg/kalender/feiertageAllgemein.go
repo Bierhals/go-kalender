@@ -1,84 +1,6 @@
-package feiertag
+package kalender
 
-import (
-	"fmt"
-	"time"
-)
-
-// Feiertag mit den Angaben zum Land und der Region und ob dieser dort als
-type Feiertag struct {
-	Name       string
-	Land       string
-	Region     *[]string
-	Datum      time.Time
-	Frei       bool
-}
-
-// NewFeiertage erstellt eine Liste der Feiertage
-func NewFeiertage(jahr int, land string, region string) (*[]Feiertag, error) {
-	if (jahr < 1900 || jahr >= 3000) {
-		return nil, fmt.Errorf("Jahr '%v' ungültig. Das Jahr muss zwischen 1900 und 2999 liegen", jahr)
-	}
-
-	switch land {
-		case "DE":
-			return newFeiertageDE(jahr, region), nil
-		default:
-			return nil, fmt.Errorf("Land '%v' unbekannt", land)
-	}
-}
-
-func newFeiertageDE(jahr int, region string) *[]Feiertag {
-	
-	feiertage := make([]Feiertag, 3)
-	feiertage[0] = Feiertag{
-		Name: "Neujahr",
-		Land: "DE",
-		Datum: Neujahr(jahr),
-		Frei: true,
-	}
-	feiertage[1] = Feiertag{
-		Name: "Ostern",
-		Land: "DE",
-		Datum: Ostern(jahr),
-		Frei: true,
-	}
-	feiertage[2] = Feiertag{
-		Name: "Silvester",
-		Land: "DE",
-		Datum: Silvester(jahr),
-		Frei: true,
-	}
-
-	return &feiertage
-}
-
-func newFeiertageAT(jahr int, region string) *[]Feiertag {
-	return nil
-}
-
-func (f Feiertag) String() string {
-	return fmt.Sprintf("%v - %v (%v)", f.Land, f.Name, f.Datum.Format("2006-01-02"))
-}
-
-// Ostern berechnet das Datum vom Ostersonntag für das übegebene Jahr
-func Ostern(jahr int) time.Time {
-	k := jahr / 100
-	m := 15 + (3*k+3)/4 - (8*k+13)/25
-	s := 2 - (3*k+3)/4
-	a := jahr % 19
-	d := (19*a + m) % 30
-	r := (d + a/11) / 29
-	og := 21 + d - r
-	sz := 7 - (jahr+jahr/4+s)%7
-	oe := 7 - (og-sz)%7
-	os := og + oe
-
-	day := os % 31
-	month := os/31 + 3
-
-	return time.Date(jahr, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-}
+import "time"
 
 // Neujahr berechnet das Datum von Neujahr für das übergebene Jahr
 func Neujahr(jahr int) time.Time {
@@ -155,9 +77,43 @@ func Karsamstag(jahr int) time.Time {
 	return Ostern(jahr).AddDate(0, 0, -1)
 }
 
+// Ostern berechnet das Datum vom Ostersonntag für das übegebene Jahr
+func Ostern(jahr int) time.Time {
+	k := jahr / 100
+	m := 15 + (3*k+3)/4 - (8*k+13)/25
+	s := 2 - (3*k+3)/4
+	a := jahr % 19
+	d := (19*a + m) % 30
+	r := (d + a/11) / 29
+	og := 21 + d - r
+	sz := 7 - (jahr+jahr/4+s)%7
+	oe := 7 - (og-sz)%7
+	os := og + oe
+
+	day := os % 31
+	month := os/31 + 3
+
+	return time.Date(jahr, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
+
 // Ostermontag berechnet das Datum von Ostermontag für das übergebene Jahr
 func Ostermontag(jahr int) time.Time {
 	return Ostern(jahr).AddDate(0, 0, 1)
+}
+
+// ChristiHimmelfahrt berechnet das Datum von "Christi Himmelfahrt" für das übergebene Jar
+func ChristiHimmelfahrt(jahr int) time.Time {
+	return Ostern(jahr).AddDate(0, 0, 39)
+}
+
+// Pfingstsonntag berechnet das Datum von Pfingstsonntag für das übergebene Jahr
+func Pfingstsonntag(jahr int) time.Time {
+	return Ostern(jahr).AddDate(0, 0, 49)
+}
+
+// Pfingstmontag berechnet das Datum von Pfingstmontag für das übergebene Jahr
+func Pfingstmontag(jahr int) time.Time {
+	return Ostern(jahr).AddDate(0, 0, 50)
 }
 
 // Walpurgisnacht berechnet das Datum von Walpurgisnacht für das übergebene Jahr
@@ -177,24 +133,9 @@ func Muttertag(jahr int) time.Time {
 	return d
 }
 
-// ChristiHimmelfahrt berechnet das Datum von "Christi Himmelfahrt" für das übergebene Jar
-func ChristiHimmelfahrt(jahr int) time.Time {
-	return Ostern(jahr).AddDate(0, 0, 39)
-}
-
 // Vatertag berechnet das Datum von Vatertag für das übergebene Jahr
 func Vatertag(jahr int) time.Time {
 	return ChristiHimmelfahrt(jahr)
-}
-
-// Pfingstsonntag berechnet das Datum von Pfingstsonntag für das übergebene Jahr
-func Pfingstsonntag(jahr int) time.Time {
-	return Ostern(jahr).AddDate(0, 0, 49)
-}
-
-// Pfingstmontag berechnet das Datum von Pfingstmontag für das übergebene Jahr
-func Pfingstmontag(jahr int) time.Time {
-	return Ostern(jahr).AddDate(0, 0, 50)
 }
 
 // Fronleichnam berechnet das Datum von Fronleichnam für das übergebene Jahr
